@@ -3,18 +3,20 @@ import {
   DataType,
   Table,
   Model,
-  BelongsToMany,
+  BelongsTo,
+  ForeignKey,
 } from 'sequelize-typescript';
 import { User } from 'src/users/users.model';
-import { UserRoles } from './user-roles.model';
 
-interface RoleCreationAttr {
-  value: string;
-  description: string;
+interface PostCreationAttrs {
+  title: string;
+  content: string;
+  userId: number;
+  image: string;
 }
 
-@Table({ tableName: 'roles' })
-export class Role extends Model<Role, RoleCreationAttr> {
+@Table({ tableName: 'posts' })
+export class Post extends Model<Post, PostCreationAttrs> {
   @Column({
     type: DataType.INTEGER,
     unique: true,
@@ -22,18 +24,26 @@ export class Role extends Model<Role, RoleCreationAttr> {
     primaryKey: true,
   })
   id: number;
-  @Column({
-    type: DataType.STRING,
-    unique: true,
-    allowNull: false,
-  })
-  value: string;
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  description: string;
 
-  @BelongsToMany(() => User, () => UserRoles)
-  roles: Role[];
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  title: string;
+
+  @Column({
+    type: DataType.STRING(100000),
+    allowNull: false,
+  })
+  content: string;
+
+  @Column({ type: DataType.STRING })
+  image: string;
+
+  @ForeignKey(() => User)
+  @Column({ type: DataType.INTEGER, allowNull: false })
+  userId: number;
+
+  @BelongsTo(() => User)
+  author: User;
 }
